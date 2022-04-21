@@ -71,6 +71,7 @@ class Running(Training):
     coeff_running_2: int = 20
 
     def get_spent_calories(self) -> float:
+        """Получить количество затраченных калорий для бега."""
         return ((self.coeff_running_1 * self.speed - self.coeff_running_2)
                 * self.weight / self.M_IN_KM * self.duration * self.M_IN_H)
 
@@ -91,6 +92,7 @@ class SportsWalking(Training):
         super().__init__(action, duration, weight)
 
     def get_spent_calories(self) -> float:
+        """Получить количество затраченных калорий для спортивной ходьбы."""
         return ((self.coeff_walking_1 * self.weight
                 + (self.speed**self.deegre_running // self.height)
                 * self.coeff_walking_2 * self.weight)
