@@ -124,32 +124,34 @@ class Swimming(Training):
                 * self.COEFF_SWIMMING_2 * self.weight)
 
 
-def read_package(workout_type: str, data: list) -> None:
+def read_package(workout_type: str, data: list) -> Training:
     """Прочитать данные полученные от датчиков."""
 
-    workout: Union[Swimming, SportsWalking, Running]
-
-    if workout_type == 'SWM':
-        workout: Swimming = Swimming(*data)
-    elif workout_type == 'RUN':
-        workout: Running = Running(*data)
-    elif workout_type == 'WLK':
-        workout: SportsWalking = SportsWalking(*data)
-
-    return workout
+    workout: Union[Swimming, SportsWalking, Running] = {
+        'SWM': Swimming,
+        'RUN': Running,
+        'WLK': SportsWalking,
+    }
+    try:
+        return workout[workout_type](*data)
+    except (TypeError, KeyError):
+        print(f"Тренировка типа: {workout_type} Неподдерживается.")
+        # raise
 
 
 def main(training: Training) -> None:
     """Главная функция."""
-
-    print(training.show_training_info().get_message())
+    try:
+        print(training.show_training_info().get_message())
+    except AttributeError:
+        raise
 
 
 if __name__ == '__main__':
     packages = [
         ('SWM', [720, 1, 80, 25, 40]),
         ('RUN', [15000, 1, 75]),
-        ('WLK', [9000, 1, 75, 180]),
+        ('WsLK', [9000, 1, 75, 180]),
     ]
 
     for workout_type, data in packages:
