@@ -1,30 +1,27 @@
-from typing import Union
+from dataclasses import dataclass, asdict
 
 
+@dataclass
 class InfoMessage:
     """Информационное сообщение о тренировке."""
-    def __init__(self,
-                 training_type: str,
-                 duration: float,
-                 distance: float,
-                 speed: float,
-                 calories: float,
-                 ) -> None:
-        self.training_type = training_type
-        self.duration_h = "{:.3f}".format(duration)
-        self.distance = "{:.3f}".format(distance)
-        self.speed = "{:.3f}".format(speed)
-        self.calories = "{:.3f}".format(calories)
+    training_type: str
+    duration: float
+    distance: float
+    speed: float
+    calories: float
 
-    def get_message(self) -> str:
+    INFO_MESSAGE: str = ("Тип тренировки: {training_type};"
+                         " Длительность: {duration:.3f} ч.;"
+                         " Дистанция: {distance:.3f} км;"
+                         " Ср. скорость: {speed:.3f} км/ч;"
+                         " Потрачено ккал: {calories:.3f}.")
+
+    def get_message(self):
         """Возвращаем данные о тренировке."""
-        return (f"Тип тренировки: {self.training_type};"
-                f" Длительность: {self.duration_h} ч.;"
-                f" Дистанция: {self.distance} км;"
-                f" Ср. скорость: {self.speed} км/ч;"
-                f" Потрачено ккал: {self.calories}.")
+        return(self.INFO_MESSAGE.format(**asdict(self)))
 
 
+@dataclass
 class Training:
     """Базовый класс тренировки."""
     M_IN_KM: float = 1000
@@ -63,13 +60,13 @@ class Training:
 
 class Running(Training):
     """Тренировка: бег."""
-    COEFF_RUNNING_1: float = 18
-    COEFF_RUNNING_2: float = 20
+    COEFF_RUNNING_FACTOR: float = 18.0
+    COEFF_RUNNING_SUBTR: float = 20.0
 
     def get_spent_calories(self) -> float:
         """Получить количество затраченных калорий для бега."""
-        return ((self.COEFF_RUNNING_1 * self.get_mean_speed()
-                 - self.COEFF_RUNNING_2)
+        return ((self.COEFF_RUNNING_FACTOR * self.get_mean_speed()
+                 - self.COEFF_RUNNING_SUBTR)
                 * self.weight / self.M_IN_KM * self.duration_h * self.M_IN_H)
 
 
@@ -127,31 +124,29 @@ class Swimming(Training):
 def read_package(workout_type: str, data: list) -> Training:
     """Прочитать данные полученные от датчиков."""
 
-    workout: Union[Swimming, SportsWalking, Running] = {
+    WORKOUT: Training = {
         'SWM': Swimming,
         'RUN': Running,
         'WLK': SportsWalking,
     }
     try:
-        return workout[workout_type](*data)
+        return WORKOUT[workout_type](*data)
     except (TypeError, KeyError):
-        print(f"Тренировка типа: {workout_type} Неподдерживается.")
-        # raise
+        print(f"Тренировка типа: {workout_type} Неподдерживается."
+              f"Поддерживаемые типы: SWM - Swimming, RUN - Running, WLK - SportsWalking")
+        raise
 
 
 def main(training: Training) -> None:
     """Главная функция."""
-    try:
-        print(training.show_training_info().get_message())
-    except AttributeError:
-        raise
+    print(training.show_training_info().get_message())
 
 
 if __name__ == '__main__':
     packages = [
         ('SWM', [720, 1, 80, 25, 40]),
-        ('RUN', [15000, 1, 75]),
-        ('WsLK', [9000, 1, 75, 180]),
+        ('RUN', [9000, 1, 75]),
+        ('WLK', [9000, 1, 75, 180]),
     ]
 
     for workout_type, data in packages:
