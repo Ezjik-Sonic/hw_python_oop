@@ -60,6 +60,7 @@ class Running(Training):
     action: float
     duration: float
     weight: float
+
     COEFF_RUNNING_FACTOR: ClassVar[float] = 18.0
     COEFF_RUNNING_SUBTR: ClassVar[float] = 20.0
 
@@ -77,6 +78,7 @@ class SportsWalking(Training):
     duration: float
     weight: float
     height: float
+
     COEFF_WALKING_1: ClassVar[float] = 0.035
     COEFF_WALKING_2: ClassVar[float] = 0.029
     DEEGRE_RUNNING: ClassVar[float] = 2
@@ -92,20 +94,15 @@ class SportsWalking(Training):
 @dataclass
 class Swimming(Training):
     """Тренировка: плавание."""
+    action: float
+    duration: float
+    weight: float
+    length_pool: float
+    count_pool: float
+
     COEFF_SWIMMING_1: ClassVar[float] = 1.1
     COEFF_SWIMMING_2: ClassVar[float] = 2
     LEN_STEP: ClassVar[float] = 1.38
-
-    def __init__(self,
-                 action: float,
-                 duration: float,
-                 weight: float,
-                 length_pool: float,
-                 count_pool: float,
-                 ) -> None:
-        super().__init__(action, duration, weight)
-        self.length_pool: float = length_pool
-        self.count_pool: float = count_pool
 
     def get_mean_speed(self) -> float:
         """Получить среднюю скорость движения во время плавания."""
