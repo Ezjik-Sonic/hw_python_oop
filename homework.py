@@ -1,5 +1,5 @@
 from dataclasses import dataclass, asdict
-from typing import ClassVar, Dict
+from typing import ClassVar, Dict, Type
 
 
 @dataclass
@@ -11,7 +11,7 @@ class InfoMessage:
     speed: float
     calories: float
 
-    info_message: str = ("Тип тренировки: {training_type};"
+    INFO_MESSAGE: str = ("Тип тренировки: {training_type};"
                          " Длительность: {duration:.3f} ч.;"
                          " Дистанция: {distance:.3f} км;"
                          " Ср. скорость: {speed:.3f} км/ч;"
@@ -19,7 +19,7 @@ class InfoMessage:
 
     def get_message(self):
         """Возвращаем данные о тренировке."""
-        return(self.info_message.format(**asdict(self)))
+        return(self.INFO_MESSAGE.format(**asdict(self)))
 
 
 @dataclass
@@ -43,7 +43,7 @@ class Training:
 
     def get_spent_calories(self) -> float:
         """Получить количество затраченных калорий."""
-        pass
+        raise NotImplementedError("Определите get_spent_calories в %s." % (self.__class__.__name__))
 
     def show_training_info(self) -> InfoMessage:
         """Вернуть информационное сообщение о выполненной тренировке."""
@@ -118,18 +118,20 @@ class Swimming(Training):
 def read_package(workout_type: str, data: list) -> Training:
     """Прочитать данные полученные от датчиков."""
 
-    WORKOUT: Dict[str, Training] = {
+    WORKOUT: Dict[str, Type[Training]] = {
         'SWM': Swimming,
         'RUN': Running,
         'WLK': SportsWalking,
     }
-    try:
-        return WORKOUT[workout_type](*data)
-    except (TypeError, KeyError):
-        print(f"Тренировка типа: {workout_type} Неподдерживается.\n"
-              f"Поддерживаемые типы:"
-              f" SWM - Swimming, RUN - Running, WLK - SportsWalking")
-        raise
+
+    if workout_type not in WORKOUT:
+        raise Exception(f"Тренировка типа:"
+                        f" {workout_type} Неподдерживается.\n"
+                        f"Поддерживаемые типы:"
+                        f" SWM - Swimming,"
+                        f" RUN - Running,"
+                        f" WLK - SportsWalking")
+    return WORKOUT[workout_type](*data)
 
 
 def main(training: Training) -> None:
