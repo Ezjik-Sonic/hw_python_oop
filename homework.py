@@ -132,7 +132,7 @@ def read_package(workout_type: str, data: list) -> Training:
                         " SWM - Swimming,"
                         " RUN - Running,"
                         " WLK - SportsWalking")
-        
+
     return WORKOUT[workout_type](*data)
 
 
